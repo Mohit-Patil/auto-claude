@@ -1,0 +1,28 @@
+Build a modern task management web application with the following features:
+
+Core Functionality:
+- Create, read, update, and delete tasks
+- Mark tasks as complete/incomplete
+- Filter tasks by status (all, active, completed)
+- Search tasks by title or description
+- Priority levels (high, medium, low) with color coding
+- Due dates with calendar picker
+- Task categories/tags
+
+User Interface:
+- Clean, modern design with responsive layout
+- Dark mode toggle
+- Smooth animations and transitions
+- Keyboard shortcuts for common actions
+- Toast notifications for actions
+
+Technical Requirements:
+- Use React with TypeScript for the frontend
+- Use Vite as the build tool
+- State management with React Context or Zustand
+- LocalStorage for data persistence
+- ESLint and Prettier for code quality
+- Comprehensive error handling
+- Accessible (ARIA labels, keyboard navigation)
+
+The application should be production-ready with proper documentation.
