@@ -27,7 +27,22 @@ def is_first_run(project_dir: Path) -> bool:
     Returns:
         True if this is the first run, False otherwise
     """
-    return not get_feature_list_path(project_dir).exists()
+    feature_list_path = get_feature_list_path(project_dir)
+
+    if not feature_list_path.exists():
+        return True
+
+    # Check if feature list is incomplete (very few features)
+    # This might indicate a crashed initialization session
+    try:
+        features = load_feature_list(project_dir)
+        if len(features) < 10:
+            print(f"\n⚠️  Warning: Only {len(features)} features found in feature_list.json")
+            print("   This might be an incomplete initialization. The agent will try to complete it.\n")
+    except Exception:
+        pass  # Let the agent handle the error
+
+    return False
 
 
 def load_feature_list(project_dir: Path) -> List[Dict]:

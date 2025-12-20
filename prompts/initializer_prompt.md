@@ -8,6 +8,9 @@ You are the initializer agent for an autonomous coding project. Your job is to s
 First, read `app_spec.txt` to understand what needs to be built.
 
 ### 2. Create feature_list.json
+
+**IMPORTANT:** If `feature_list.json` already exists (from a previous incomplete session), read it first and complete/improve it rather than starting over.
+
 Generate a comprehensive test suite in `feature_list.json` with the following structure:
 
 ```json
@@ -22,13 +25,14 @@ Generate a comprehensive test suite in `feature_list.json` with the following st
 ```
 
 Requirements for feature_list.json:
-- **Minimum 200 test cases** covering all aspects of the specification
+- **Create 40-50 comprehensive test cases** covering all aspects of the specification
 - Include both functional tests and style/UX tests
 - Order tests by priority (fundamental features first)
-- At least 25 tests should require 10+ steps to verify
+- At least 10 tests should require 10+ steps to verify
 - Mix of narrow (2-5 steps) and comprehensive multi-step tests
 - Every test must start with `"passes": false`
 - Cover edge cases, error handling, accessibility, and user experience
+- Focus on quality over quantity - each test should be detailed and actionable
 
 ### 3. Create init.sh Script
 Build an environment setup script that:
@@ -55,6 +59,14 @@ echo "Application running at http://localhost:5173"
 - Features can only transition from incomplete (`"passes": false`) to complete (`"passes": true`)
 - Feature descriptions and test procedures MUST remain unchanged
 - This ensures no functionality is lost between sessions
+
+## SANDBOXED ENVIRONMENT NOTES
+
+This agent runs in a sandboxed environment with security restrictions:
+- **Port binding restricted**: Cannot start dev servers on ports like 3000, 5173, etc.
+- **Testing approach**: Code verification and build verification instead of browser automation
+- **Solution**: Verify code is correct, compiles, and follows the spec rather than clicking through UI manually
+- Future sessions can run the app outside this sandbox for full browser testing
 
 ## Optional
 

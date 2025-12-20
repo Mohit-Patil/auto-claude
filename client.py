@@ -11,7 +11,8 @@ from security import validate_bash_command
 
 def create_client(
     project_dir: Path,
-    model: str = "claude-sonnet-4-5-20250929"
+    model: str = "claude-sonnet-4-5-20250929",
+    auth_method: str = "subscription"
 ) -> ClaudeSDKClient:
     """
     Create a Claude SDK client with security controls.
@@ -24,16 +25,20 @@ def create_client(
     Args:
         project_dir: Path to the project directory
         model: Claude model to use
+        auth_method: Authentication method - "subscription" (uses Claude Code auth) or "api-key"
 
     Returns:
         Configured ClaudeSDKClient instance
 
     Raises:
-        ValueError: If ANTHROPIC_API_KEY is not set
+        ValueError: If auth_method is "api-key" and ANTHROPIC_API_KEY is not set
     """
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise ValueError("ANTHROPIC_API_KEY environment variable is required")
+    # Only require API key if using api-key authentication
+    if auth_method == "api-key":
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise ValueError("ANTHROPIC_API_KEY environment variable is required when using api-key authentication")
+    # When using subscription, the SDK will use Claude Code's authentication
 
     # Ensure project directory exists
     project_dir = Path(project_dir).absolute()
