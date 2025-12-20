@@ -33,12 +33,10 @@ def create_client(
     Raises:
         ValueError: If auth_method is "api-key" and ANTHROPIC_API_KEY is not set
     """
-    # Only require API key if using api-key authentication
     if auth_method == "api-key":
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY environment variable is required when using api-key authentication")
-    # When using subscription, the SDK will use Claude Code's authentication
 
     # Ensure project directory exists
     project_dir = Path(project_dir).absolute()

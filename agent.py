@@ -50,67 +50,44 @@ async def run_agent_session(
     response_text = ""
     has_error = False
 
-    # Process messages with timeout
-    print("⏳ Waiting for agent response (timeout: 15 minutes)...\n")
+    # Process messages
+    async for message in client.receive_messages():
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(f"\n{block.text}\n")
+                    response_text += block.text + "\n"
 
-    try:
-        async def process_messages():
-            nonlocal response_text, has_error
+                elif isinstance(block, ToolUseBlock):
+                    tool_input_str = str(block.input)
+                    if len(tool_input_str) > 200:
+                        tool_input_str = tool_input_str[:200] + "..."
 
-            async for message in client.receive_messages():
-                if isinstance(message, AssistantMessage):
-                    for block in message.content:
-                        if isinstance(block, TextBlock):
-                            # Display agent's text responses
-                            print(f"\n{block.text}\n")
-                            response_text += block.text + "\n"
+                    print(f"🔧 Using tool: {block.name}")
+                    print(f"   Input: {tool_input_str}")
 
-                        elif isinstance(block, ToolUseBlock):
-                            # Display tool usage
-                            tool_input_str = str(block.input)
-                            if len(tool_input_str) > 200:
-                                tool_input_str = tool_input_str[:200] + "..."
+        elif isinstance(message, ToolResultBlock):
+            if message.is_error:
+                print(f"   ❌ [Error]")
+                has_error = True
+            else:
+                print(f"   ✅ [Done]")
 
-                            print(f"🔧 Using tool: {block.name}")
-                            print(f"   Input: {tool_input_str}")
+        elif isinstance(message, ResultMessage):
+            print(f"\n{'='*70}")
+            print(f"Session {iteration} completed")
+            print(f"Duration: {message.duration_ms / 1000:.2f}s")
+            print(f"Turns: {message.num_turns}")
 
-                elif isinstance(message, ToolResultBlock):
-                    # Display tool results
-                    if message.is_error:
-                        print(f"   ❌ [Error]")
-                        has_error = True
-                    else:
-                        print(f"   ✅ [Done]")
+            if message.total_cost_usd:
+                print(f"Cost: ${message.total_cost_usd:.4f}")
 
-                elif isinstance(message, ResultMessage):
-                    # Session completed
-                    print(f"\n{'='*70}")
-                    print(f"Session {iteration} completed")
-                    print(f"Duration: {message.duration_ms / 1000:.2f}s")
-                    print(f"Turns: {message.num_turns}")
+            print(f"{'='*70}\n")
 
-                    if message.total_cost_usd:
-                        print(f"Cost: ${message.total_cost_usd:.4f}")
+            if message.is_error:
+                has_error = True
 
-                    print(f"{'='*70}\n")
-
-                    if message.is_error:
-                        has_error = True
-
-                    # Break out of the message loop
-                    break
-
-        # 15-minute timeout for agent sessions (they can be long-running)
-        await asyncio.wait_for(process_messages(), timeout=900.0)
-
-    except asyncio.TimeoutError:
-        print("\n⚠️  Timeout: Agent session exceeded 15 minutes")
-        print("   This might indicate the agent is stuck or the task is too complex.")
-        print("   The session will retry automatically.\n")
-        has_error = True
-    except Exception as e:
-        print(f"\n⚠️  Error processing messages: {e}")
-        has_error = True
+            break
 
     status = "error" if has_error else "continue"
     return status, response_text
@@ -137,8 +114,6 @@ async def run_autonomous_agent(
     """
     project_dir = Path(project_dir).absolute()
     iteration = 1
-    consecutive_failures = 0
-    MAX_CONSECUTIVE_FAILURES = 3
 
     print("\n" + "="*70)
     print("  AUTONOMOUS CODING AGENT")
@@ -181,25 +156,11 @@ async def run_autonomous_agent(
 
         try:
             async with create_client(project_dir, model, auth_method) as client:
-                # Run the session
                 status, response = await run_agent_session(client, prompt, iteration)
 
                 if status == "error":
-                    consecutive_failures += 1
-                    print(f"\n⚠️  Session ended with errors (consecutive failures: {consecutive_failures}/{MAX_CONSECUTIVE_FAILURES})")
-
-                    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
-                        print(f"\n❌ Reached maximum consecutive failures ({MAX_CONSECUTIVE_FAILURES})")
-                        print("   This usually means:")
-                        print("   - The task is too complex or ambiguous")
-                        print("   - There's a network connectivity issue")
-                        print("   - The authentication token has expired")
-                        print("\n   Please check the error messages above and try again.")
-                        break
-                    else:
-                        print("   Retrying in next session...")
+                    print("\n⚠️  Session ended with errors. Retrying in next session...")
                 else:
-                    consecutive_failures = 0  # Reset on success
                     print("\n✅ Session completed successfully!")
 
         except KeyboardInterrupt:
@@ -208,16 +169,8 @@ async def run_autonomous_agent(
             print(f"  python autonomous_agent_demo.py --project-dir {project_dir}")
             break
         except Exception as e:
-            consecutive_failures += 1
             print(f"\n❌ Error in session {iteration}: {str(e)}")
-            print(f"   Consecutive failures: {consecutive_failures}/{MAX_CONSECUTIVE_FAILURES}")
-
-            if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
-                print(f"\n❌ Too many consecutive failures. Stopping.")
-                print("   Check your authentication and network connection.")
-                break
-            else:
-                print("   Will retry in next session...")
+            print("   Will retry in next session...")
 
         # Auto-continue delay
         if not max_iterations or iteration < max_iterations:

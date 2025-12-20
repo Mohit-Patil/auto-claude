@@ -116,7 +116,7 @@ python spec_builder.py
 - Maximum 6 conversation turns (prevents getting stuck)
 - Automatic timeout after 120 seconds per response (prevents hanging)
 
-**Need Help?** See [SPEC_BUILDER_TIPS.md](./SPEC_BUILDER_TIPS.md) for troubleshooting and best practices.
+**Need Help?** See [SPEC_BUILDER_TIPS.md](./docs/SPEC_BUILDER_TIPS.md) for troubleshooting and best practices.
 
 ### Option 2: Use Existing Spec
 
@@ -354,7 +354,7 @@ The agent verifies features by:
 5. ✅ Browser automation (Puppeteer) - starts dev server and tests UI
 6. ✅ Manual verification steps documented
 
-See [NORMAL_MODE_GUIDE.md](./NORMAL_MODE_GUIDE.md) for detailed information.
+See [NORMAL_MODE_GUIDE.md](./docs/NORMAL_MODE_GUIDE.md) for detailed information.
 
 ## Running the Generated Application
 
@@ -516,6 +516,14 @@ python autonomous_agent_demo.py \
 # Interrupt with Ctrl+C when needed
 # Resume later with the same command
 ```
+
+## Roadmap
+
+### Upcoming Features
+
+- 🔗 **Linear Integration**: Sync feature progress with Linear issues and update task status automatically
+- 🔗 **GitHub Projects Integration**: Track development progress in GitHub Projects boards
+- Additional project management integrations planned
 
 ## Contributing
 
