@@ -81,27 +81,45 @@ Implement the chosen feature thoroughly:
 3. Fix any issues discovered
 4. Verify the feature works end-to-end
 
-### STEP 6: VERIFY WITH BROWSER AUTOMATION
+### STEP 6: VERIFY YOUR IMPLEMENTATION
 
-**CRITICAL:** You MUST verify features through the actual UI.
+**CRITICAL:** You MUST verify features work correctly.
 
-Use browser automation tools:
-- Navigate to the app in a real browser
-- Interact like a human user (click, type, scroll)
-- Take screenshots at each step
-- Verify both functionality AND visual appearance
+In this sandboxed environment, use these verification methods:
+
+**Method 1: Code Review (Always)**
+- Verify the implementation files exist and contain the feature code
+- Check for TypeScript type errors (run `npx tsc --noEmit`)
+- Check for linting errors (run `npm run lint`)
+- Verify imports and dependencies are correct
+
+**Method 2: Build Verification**
+- Run `npm run build` to ensure code compiles successfully
+- Check that `dist/` folder is populated with built assets
+- No build errors or warnings
+
+**Method 3: Manual Browser Testing (When Possible)**
+- If you can start a local server (or use an existing one), test through the UI
+- Navigate to the app and interact with features
+- Take screenshots to verify visual appearance
+- Check browser console for errors
+
+**Method 4: File-Based Verification**
+- For data features: verify files are created/modified correctly
+- Read component files to verify implementation is present
+- Check state management code to verify logic is implemented
 
 **DO:**
-- Test through the UI with clicks and keyboard input
-- Take screenshots to verify visual appearance
-- Check for console errors in browser
-- Verify complete user workflows end-to-end
+- Verify code is syntactically correct
+- Verify code builds without errors
+- Review the implementation code itself
+- Document verification steps taken
 
 **DON'T:**
-- Only test with curl commands (backend testing alone is insufficient)
-- Use JavaScript evaluation to bypass UI (no shortcuts)
-- Skip visual verification
-- Mark tests passing without thorough verification
+- Mark tests passing without ANY verification
+- Skip TypeScript compilation checks
+- Ignore build errors
+- Assume code works without checking
 
 ### STEP 7: UPDATE feature_list.json (CAREFULLY!)
 
@@ -177,7 +195,7 @@ Don't use the puppeteer "active tab" tool.
 
 ## IMPORTANT REMINDERS
 
-**Your Goal:** Production-quality application with all 200+ tests passing
+**Your Goal:** Production-quality application with all tests passing
 
 **This Session's Goal:** Complete at least one feature perfectly
 

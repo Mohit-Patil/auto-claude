@@ -55,12 +55,10 @@ async def run_agent_session(
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
-                    # Display agent's text responses
                     print(f"\n{block.text}\n")
                     response_text += block.text + "\n"
 
                 elif isinstance(block, ToolUseBlock):
-                    # Display tool usage
                     tool_input_str = str(block.input)
                     if len(tool_input_str) > 200:
                         tool_input_str = tool_input_str[:200] + "..."
@@ -69,7 +67,6 @@ async def run_agent_session(
                     print(f"   Input: {tool_input_str}")
 
         elif isinstance(message, ToolResultBlock):
-            # Display tool results
             if message.is_error:
                 print(f"   ❌ [Error]")
                 has_error = True
@@ -77,7 +74,6 @@ async def run_agent_session(
                 print(f"   ✅ [Done]")
 
         elif isinstance(message, ResultMessage):
-            # Session completed
             print(f"\n{'='*70}")
             print(f"Session {iteration} completed")
             print(f"Duration: {message.duration_ms / 1000:.2f}s")
@@ -91,7 +87,6 @@ async def run_agent_session(
             if message.is_error:
                 has_error = True
 
-            # Break out of the message loop
             break
 
     status = "error" if has_error else "continue"
@@ -101,7 +96,8 @@ async def run_agent_session(
 async def run_autonomous_agent(
     project_dir: Path,
     model: str = "claude-sonnet-4-5-20250929",
-    max_iterations: int | None = None
+    max_iterations: int | None = None,
+    auth_method: str = "subscription"
 ):
     """
     Run the autonomous agent in a loop.
@@ -114,6 +110,7 @@ async def run_autonomous_agent(
         project_dir: Path to the project directory
         model: Claude model to use
         max_iterations: Optional maximum number of iterations (None for unlimited)
+        auth_method: Authentication method - "subscription" or "api-key"
     """
     project_dir = Path(project_dir).absolute()
     iteration = 1
@@ -158,8 +155,7 @@ async def run_autonomous_agent(
         print("🔌 Connecting to Claude...")
 
         try:
-            async with create_client(project_dir, model) as client:
-                # Run the session
+            async with create_client(project_dir, model, auth_method) as client:
                 status, response = await run_agent_session(client, prompt, iteration)
 
                 if status == "error":
